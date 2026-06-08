@@ -1,129 +1,1285 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>業務改善・ホームページ制作 | ラクWebサポート</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ラクWebサービス | 中小企業のIT化・Web制作</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Shippori+Mincho:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #181c24;
+    --paper: #f4f6f9;
+    --paper-dark: #eaecf2;
+    --accent: #2555a0;
+    --accent-light: #4a7dd4;
+    --accent-pale: #d8e4f5;
+    --accent-dark: #1a3d7a;
+    --line: rgba(24,28,36,0.10);
+    --line-dark: rgba(24,28,36,0.22);
+    --mono: 'DM Mono', monospace;
+    --serif: 'Noto Serif JP', serif;
+    --display: 'Shippori Mincho', serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-weight: 300;
+    line-height: 1.9;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── カスタムカーソル ── */
+  #cursor {
+    position: fixed; top: 0; left: 0;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.2s;
+    transform: translate(-50%, -50%);
+  }
+  #cursor-ring {
+    position: fixed; top: 0; left: 0;
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.35s cubic-bezier(.23,1,.32,1), width 0.3s, height 0.3s, opacity 0.2s;
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+  }
+  body.cursor-hover #cursor { transform: translate(-50%,-50%) scale(2.5); background: var(--accent-light); }
+  body.cursor-hover #cursor-ring { width: 56px; height: 56px; opacity: 0.2; }
+
+  /* ── ローディング ── */
+  #loader {
+    position: fixed; inset: 0;
+    background: var(--ink);
+    z-index: 8000;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+  }
+  #loader .l-logo {
+    display: flex; align-items: center; gap: 12px;
+    opacity: 0;
+    animation: fadeIn 0.5s 0.2s forwards;
+  }
+  #loader .l-text {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent-light);
+    opacity: 0;
+    animation: fadeIn 0.5s 0.3s forwards;
+  }
+  #loader .l-bar-wrap {
+    width: 200px; height: 1px;
+    background: rgba(255,255,255,0.1);
+    overflow: hidden;
+  }
+  #loader .l-bar {
+    height: 100%;
+    background: var(--accent-light);
+    width: 0%;
+    transition: width 0.05s linear;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* ── ナビゲーション ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 18px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.4s, box-shadow 0.4s;
+    background: transparent;
+  }
+  nav.scrolled {
+    background: rgba(244,246,249,0.94);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .nav-logo-wrap {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  /* SVGロゴ */
+  .nav-logo-svg { flex-shrink: 0; }
+  .nav-logo-text {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .nav-logo-text span { color: var(--accent); }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    color: var(--ink);
+    opacity: 0.6;
+    position: relative;
+    transition: opacity 0.2s;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0;
+    width: 0; height: 1px; background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ── ヒーロー ── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative; z-index: 2;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.7s 0.5s;
+    margin-bottom: 20px;
+  }
+  .hero-title {
+    font-family: var(--display);
+    font-size: clamp(40px, 5vw, 72px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s 0.7s;
+  }
+  .hero-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero-sub {
+    margin-top: 28px;
+    font-size: 13px;
+    line-height: 2.1;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.7s 1s;
+    color: rgba(24,28,36,0.6);
+    max-width: 360px;
+  }
+  .hero-cta {
+    margin-top: 40px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.7s 1.2s;
+    display: flex; gap: 16px; align-items: center;
+  }
+  .btn-primary {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s;
+  }
+  .btn-primary::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--ink);
+    transform: scaleX(0); transform-origin: right;
+    transition: transform 0.4s cubic-bezier(.23,1,.32,1);
+  }
+  .btn-primary:hover::before { transform: scaleX(1); transform-origin: left; }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+    text-decoration: none;
+    opacity: 0.5;
+    display: flex; align-items: center; gap: 6px;
+    transition: opacity 0.2s;
+  }
+  .btn-secondary:hover { opacity: 1; }
+  .btn-secondary::after { content: '↓'; font-size: 14px; }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-canvas-wrap {
+    position: absolute; inset: 0;
+  }
+  #heroCanvas { width: 100%; height: 100%; display: block; }
+
+  /* ── セクション共通 ── */
+  section { padding: 100px 48px; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: block;
+  }
+  .section-heading {
+    font-family: var(--display);
+    font-size: clamp(28px, 3.5vw, 48px);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ── キャンペーン ── */
+  #campaign {
+    background: var(--ink);
+    color: var(--paper);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    padding: 80px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  #campaign::before {
+    content: ''; position: absolute;
+    right: -100px; top: -100px;
+    width: 400px; height: 400px;
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  #campaign::after {
+    content: ''; position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 50%;
+  }
+  .campaign-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--accent-light);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .campaign-badge::before {
+    content: ''; display: block;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-light);
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.2; }
+  }
+  .campaign-price {
+    font-family: var(--display);
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .campaign-price sup { font-size: 0.35em; vertical-align: super; opacity: 0.6; }
+  .campaign-price span { color: var(--accent-light); }
+  .campaign-detail {
+    font-size: 13px;
+    line-height: 2;
+    opacity: 0.6;
+    margin-top: 20px;
+  }
+  .campaign-right .section-label { color: var(--accent-light); }
+  .campaign-right .section-heading { color: var(--paper); font-size: clamp(22px,2.5vw,32px); }
+  .campaign-right p { font-size: 13px; line-height: 2; opacity: 0.65; margin-top: 16px; }
+  .countdown-wrap { margin-top: 32px; }
+  .countdown-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    opacity: 0.4;
+    margin-bottom: 10px;
+  }
+  .countdown { display: flex; gap: 20px; }
+  .c-unit { text-align: center; }
+  .c-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--accent-light);
+    display: block;
+    line-height: 1;
+  }
+  .c-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    opacity: 0.35;
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* ── サービス ── */
+  #services { background: var(--paper-dark); }
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 60px;
+    background: var(--line);
+  }
+  .service-card {
+    background: var(--paper-dark);
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+  }
+  .service-card:hover { background: var(--paper); }
+  .service-card::before {
+    content: attr(data-num);
+    position: absolute;
+    top: 36px; right: 40px;
+    font-family: var(--mono);
+    font-size: 72px;
+    font-weight: 300;
+    color: var(--accent-pale);
+    line-height: 1;
+    transition: color 0.4s;
+  }
+  .service-card:hover::before { color: var(--accent); opacity: 0.2; }
+  .service-icon {
+    width: 48px; height: 48px;
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 24px;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .service-card:hover .service-icon { background: var(--accent); }
+  .service-title {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  .service-list {
+    list-style: none;
+    font-size: 13px;
+    line-height: 2;
+    opacity: 0.7;
+  }
+  .service-list li {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .service-list li::before {
+    content: '—';
+    font-family: var(--mono);
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 11px;
+  }
+  .service-price {
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .service-price::before {
+    content: ''; display: block;
+    width: 24px; height: 1px; background: var(--accent);
+  }
+
+  /* ── 数字ハイライト ── */
+  #stats {
+    padding: 80px 48px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background-color: var(--line);
+  }
+  .stat-card {
+    background: var(--paper);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-num {
+    font-family: var(--display);
+    font-size: clamp(56px, 6vw, 80px);
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stat-suffix {
+    font-size: 0.45em;
+    font-weight: 400;
+    vertical-align: bottom;
+    opacity: 0.7;
+  }
+  .stat-label {
+    margin-top: 12px;
+    font-size: 13px;
+    opacity: 0.55;
+    line-height: 1.8;
+  }
+
+  /* ── 特徴 ── */
+  #features { background: var(--paper); }
+  .features-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    margin-top: 60px;
+    align-items: start;
+  }
+  .feature-terminal {
+    background: var(--ink);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .terminal-bar {
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.05);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .t-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .t-dot:nth-child(1) { background: #ff5f57; }
+  .t-dot:nth-child(2) { background: #febc2e; }
+  .t-dot:nth-child(3) { background: #28c840; }
+  .terminal-body {
+    padding: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 2;
+    color: rgba(255,255,255,0.7);
+    min-height: 280px;
+  }
+  .t-line { display: block; }
+  .t-prompt { color: var(--accent-light); }
+  .t-comment { color: rgba(255,255,255,0.3); }
+  .t-string { color: #f8c79c; }
+  .t-key { color: #9ecbff; }
+  .t-val { color: #9ef7ae; }
+  .t-cursor {
+    display: inline-block;
+    width: 7px; height: 13px;
+    background: var(--accent-light);
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+  }
+  .feature-list { display: flex; flex-direction: column; gap: 28px; }
+  .feature-item {
+    padding: 24px;
+    border: 1px solid var(--line);
+    position: relative;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .feature-item:hover {
+    border-color: var(--accent);
+    box-shadow: 4px 4px 0 var(--accent-pale);
+  }
+  .feature-item-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .feature-item-title {
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .feature-item-text {
+    font-size: 13px;
+    line-height: 1.9;
+    opacity: 0.6;
+  }
+
+  /* ── 代表 ── */
+  #about {
+    background: var(--paper-dark);
+    padding: 100px 48px;
+  }
+  .about-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .about-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .about-name-block {
+    display: flex;
+  }
+  .about-name {
+    font-family: var(--display);
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+  }
+  .about-role {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-top: 8px;
+  }
+  /* 技術タグ */
+  .about-tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-left: auto;
+    align-self: flex-start;
+    padding-top: 4px;
+  }
+  .tech-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 8px;
+    opacity: 0.55;
+    white-space: nowrap;
+  }
+  .about-divider {
+    width: 48px; height: 1px;
+    background: var(--accent);
+    margin-bottom: 32px;
+    opacity: 0.4;
+  }
+  .about-text {
+    font-size: 14px;
+    line-height: 2.3;
+    opacity: 0.68;
+    columns: 2;
+    column-gap: 48px;
+  }
+  .about-text p + p { margin-top: 1em; }
+  @media (max-width: 700px) {
+    .about-text { columns: 1; }
+    .about-tech-tags { margin-left: 0; }
+  }
+
+  /* ── お問い合わせ ── */
+  #contact {
+    background: var(--paper);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  #contact::before {
+    content: 'CONTACT';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-family: var(--display);
+    font-size: clamp(80px, 15vw, 200px);
+    font-weight: 800;
+    color: rgba(37,85,160,0.05);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+  .contact-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+  .contact-info {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+  }
+  .contact-info-item { text-align: left; }
+  .contact-info-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .contact-info-val { font-size: 14px; opacity: 0.7; }
+  .btn-contact {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 48px;
+    border: 1px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-decoration: none;
+    color: var(--ink);
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s;
+    margin-top: 8px;
+  }
+  .btn-contact::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--ink);
+    transform: scaleY(0); transform-origin: bottom;
+    transition: transform 0.4s cubic-bezier(.23,1,.32,1);
+  }
+  .btn-contact:hover { color: var(--paper); }
+  .btn-contact:hover::before { transform: scaleY(1); }
+  .btn-contact span { position: relative; z-index: 1; }
+  .btn-contact svg { position: relative; z-index: 1; }
+
+  /* ── フッター ── */
+  footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-logo-wrap {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .footer-logo-text {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+  .footer-logo-text span { color: var(--accent-light); }
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    opacity: 0.3;
+  }
+  .footer-links { display: flex; gap: 28px; list-style: none; }
+  .footer-links a {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--paper);
+    text-decoration: none;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .footer-links a:hover { opacity: 0.9; }
+
+  /* ── スクロールプログレス ── */
+  #progress {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 2px; background: var(--accent);
+    transform-origin: left;
+    transform: scaleX(0);
+    z-index: 200;
+    transition: transform 0.05s linear;
+  }
+
+  /* ── レスポンシブ ── */
+  @media (max-width: 900px) {
+    nav { padding: 18px 24px; }
+    .nav-links { display: none; }
+    #hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 120px 24px 60px; justify-content: flex-start; }
+    section { padding: 60px 24px; }
+    #campaign { grid-template-columns: 1fr; padding: 60px 24px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card { padding: 32px 24px; }
+    #stats { grid-template-columns: 1fr 1fr; }
+    .features-wrap { grid-template-columns: 1fr; }
+    #about { padding: 60px 24px; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .footer-links { justify-content: center; }
+    body { cursor: auto; }
+    #cursor, #cursor-ring { display: none; }
+  }
+</style>
 </head>
 <body>
 
-<header>
-    <div class="container">
-        <h1>ラクWebサポート</h1>
-        <nav>
-            <a href="#services">サービス</a>
-            <a href="#about">事業概要</a>
-            <a href="#contact">お問い合わせ</a>
-        </nav>
-    </div>
-</header>
+<!-- カーソル -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
 
-<section class="hero">
-    <div class="container">
-        <h2>Excel・Googleスプレッドシート活用によるランニング費用を抑えた業務改善</h2>
-        <p>
-            事務作業の工数削減と、ホームページ制作・SNS運用を通じて
-            中小企業・個人事業主の成長を支援します。
-        </p>
-        <a href="#contact" class="btn">相談する</a>
+<!-- スクロールバー -->
+<div id="progress"></div>
+
+<!-- ローダー -->
+<div id="loader">
+  <div class="l-logo">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="34" height="34" rx="4" stroke="#4a7dd4" stroke-width="1.2"/>
+      <path d="M9 18 L15 12 L21 18 L27 12" stroke="#4a7dd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 24 L15 18 L21 24 L27 18" stroke="#4a7dd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+    </svg>
+  </div>
+  <div class="l-text">LOADING...</div>
+  <div class="l-bar-wrap"><div class="l-bar" id="loaderBar"></div></div>
+</div>
+
+<!-- ナビ -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo-wrap">
+    <img src="logo.png" alt="ラクWebサポート" class="company-logo" style="height:30px;width:auto;">
+    <div class="nav-logo-text">ラク<span>Web</span>サービス</div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#campaign">キャンペーン</a></li>
+    <li><a href="#services">サービス</a></li>
+    <li><a href="#about">代表</a></li>
+    <li><a href="#contact">お問い合わせ</a></li>
+  </ul>
+</nav>
+
+<!-- ヒーロー -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow" id="heroEyebrow">WEB SERVICE / DIGITAL SOLUTIONS</div>
+    <h1 class="hero-title" id="heroTitle">
+      中小企業の<br><em>IT化</em>を、<br>確かな技術で。
+    </h1>
+    <p class="hero-sub" id="heroSub">
+      事務作業の自動化からホームページ制作・SNS運用まで、<br>
+      貴社の規模と現状に最適化したご提案を行います。
+    </p>
+    <div class="hero-cta" id="heroCta">
+      <a href="#contact" class="btn-primary"><span>お問い合わせ</span></a>
+      <a href="#services" class="btn-secondary">サービス一覧</a>
     </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-canvas-wrap">
+      <canvas id="heroCanvas"></canvas>
+    </div>
+  </div>
 </section>
 
-<section id="services" class="section">
-    <div class="container">
-        <h2>サービス内容</h2>
-
-        <div class="cards">
-
-            <div class="card">
-                <h3>Excel自動化</h3>
-                <p>
-                    VBAや関数を活用し、
-                    手作業の集計・転記作業を効率化します。
-                </p>
-            </div>
-
-            <div class="card">
-                <h3>Google Spreadsheet活用</h3>
-                <p>
-                    Apps Scriptや各種連携により、
-                    クラウド上での業務改善を実現します。
-                </p>
-            </div>
-
-            <div class="card">
-                <h3>ホームページ制作</h3>
-                <p>
-                    小規模事業者向けに、
-                    シンプルで管理しやすいWebサイトを制作します。
-                </p>
-            </div>
-
-            <div class="card">
-                <h3>SNS運用</h3>
-                <p>
-                    感度の高い若者のニーズをとらえた
-                    効果的な広告方法を提供します。
-                </p>
-            </div>
-
-        </div>
+<!-- キャンペーン -->
+<section id="campaign">
+  <div class="campaign-left reveal">
+    <div class="campaign-badge">LIMITED CAMPAIGN</div>
+    <div class="campaign-price">
+      <sup>¥</sup><span>1</span>万/月<sup>(10ヶ月払)</sup>
     </div>
+    <p class="campaign-detail">
+      創業記念キャンペーン実施中<br>
+      会社の特色を踏まえた、オリジナルHP制作を<br>
+      特別価格にてご提供しています。
+    </p>
+  </div>
+  <div class="campaign-right reveal reveal-delay-2">
+    <span class="section-label">FOUNDING CAMPAIGN</span>
+    <h2 class="section-heading">期間限定<br>特別価格でHP制作</h2>
+    <p>
+      貴社の業種・ブランドイメージ・ターゲット層をヒアリングし、
+      他にはない独自性のあるHPを制作します。
+      Google検索・AI検索への対応も標準で行います。
+    </p>
+    <div class="countdown-wrap">
+      <div class="countdown-label">CAMPAIGN ENDS IN</div>
+      <div class="countdown">
+        <div class="c-unit"><span class="c-num" id="cdDays">--</span><span class="c-label">DAYS</span></div>
+        <div class="c-unit"><span class="c-num" id="cdHours">--</span><span class="c-label">HRS</span></div>
+        <div class="c-unit"><span class="c-num" id="cdMins">--</span><span class="c-label">MIN</span></div>
+        <div class="c-unit"><span class="c-num" id="cdSecs">--</span><span class="c-label">SEC</span></div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="section bg-light">
-    <div class="container">
-        <h2>こんなお悩みはありませんか？</h2>
+<!-- サービス -->
+<section id="services">
+  <span class="section-label reveal">SERVICES</span>
+  <h2 class="section-heading reveal reveal-delay-1">提供サービス</h2>
 
-        <ul class="problems">
-            <li>毎月同じExcel作業を繰り返している</li>
-            <li>担当者しか分からない属人化した業務がある</li>
-            <li>データ分析をしたいが方法が分からない</li>
-            <li>会社のホームページを作りたい</li>
-            <li>IT担当者がいない</li>
-        </ul>
+  <div class="services-grid">
+    <div class="service-card reveal" data-num="01">
+      <div class="service-icon">📋</div>
+      <h3 class="service-title">事務作業削減支援</h3>
+      <ul class="service-list">
+        <li>事業形態・IT環境・スタッフの習熟度に合わせたご提案</li>
+        <li>Googleスプレッドシートなど無料ツールを最大限に活用</li>
+        <li>Excelの自動化やデータ管理システムによる業務効率化</li>
+        <li>手書き書類の電子化を予算・状況に応じて最適にご提案</li>
+        <li>事務業務時間 平均30% 削減</li>
+      </ul>
+      <div class="service-price">月額 ¥50,000〜から</div>
     </div>
+
+    <div class="service-card reveal reveal-delay-1" data-num="02">
+      <div class="service-icon">🖥</div>
+      <h3 class="service-title">ホームページ制作・動画編集・SNS運用</h3>
+      <ul class="service-list">
+        <li>丁寧なヒアリングで希望のコンセプトに沿ったHP制作</li>
+        <li>Google検索・AI検索に見つけてもらいやすいサイト構築</li>
+        <li>ネットショップ（ECサイト）の導入・運用支援</li>
+        <li>10〜20代のトレンドを踏まえたコンテンツのご提案</li>
+        <li>動画編集・SNSアカウントの運用代行</li>
+      </ul>
+      <div class="service-price">創業キャンペーン HP制作：¥100,000</div>
+    </div>
+  </div>
 </section>
 
-<section id="about" class="section">
-    <div class="container">
-        <h2>事業概要</h2>
+<!-- 実績数字 -->
+<div id="stats">
+  <div class="stat-card reveal">
+    <div class="stat-num"><span class="count-num" data-target="30">0</span><span class="stat-suffix">%</span></div>
+    <div class="stat-label">事務業務時間<br>平均削減率</div>
+  </div>
+  <div class="stat-card reveal reveal-delay-1">
+    <div class="stat-num"><span class="count-num" data-target="100">0</span><span class="stat-suffix">%</span></div>
+    <div class="stat-label">ヒアリング満足度<br>（お客様アンケート）</div>
+  </div>
+  <div class="stat-card reveal reveal-delay-2">
+    <div class="stat-num">¥<span class="count-num" data-target="0">0</span><span class="stat-suffix">〜</span></div>
+    <div class="stat-label">ツール利用料<br>（無料サービス活用）</div>
+  </div>
+</div>
 
-        <p>
-            ラクWebサポートは、
-            Excel・Google Spreadsheet・AIを活用した
-            業務改善支援およびホームページ制作を行う個人事業です。
-        </p>
-
-        <p>
-            小規模事業者・個人事業主のお客様に対し、
-            「難しいITを分かりやすく」をモットーに
-            実務に役立つ仕組みづくりをご提供します。
-        </p>
+<!-- 特徴 -->
+<section id="features">
+  <span class="section-label reveal">APPROACH</span>
+  <h2 class="section-heading reveal reveal-delay-1">技術と対話の<br>両立</h2>
+  <div class="features-wrap">
+    <div class="feature-terminal reveal">
+      <div class="terminal-bar">
+        <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+        <span style="margin-left:8px;font-family:var(--mono);font-size:10px;opacity:0.3;letter-spacing:0.1em;">proposal.config</span>
+      </div>
+      <div class="terminal-body" id="terminalBody">
+      </div>
     </div>
+    <div class="feature-list reveal reveal-delay-2">
+      <div class="feature-item">
+        <div class="feature-item-label">01 — ASSESSMENT</div>
+        <div class="feature-item-title">現状把握から始める</div>
+        <div class="feature-item-text">高額なシステム導入ありきではなく、まず現状の業務の流れと課題を丁寧にヒアリング。最小のコストで最大の効果を生むご提案を行います。</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-item-label">02 — TECHNOLOGY</div>
+        <div class="feature-item-title">確かな技術力</div>
+        <div class="feature-item-text">Excelの自動化・Access/BigQueryによるデータ管理・ホームページ制作まで幅広く対応。最新のAI検索への対応を含めた、見つかりやすいサイト設計を行います。</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-item-label">03 — TREND</div>
+        <div class="feature-item-title">トレンドを味方に</div>
+        <div class="feature-item-text">10〜20代の消費行動・SNSのトレンドに精通。若い世代へのリーチを意識した情報発信で、ブランドの訴求力を高めます。</div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section id="contact" class="section contact">
-    <div class="container">
-        <h2>お問い合わせ</h2>
-
-        <p>
-            ご相談・お見積りはお気軽にお問い合わせください。
-        </p>
-
-        <a href="mailto:example@example.com" class="btn">
-            メールで問い合わせる
-        </a>
+<!-- 代表 -->
+<section id="about">
+  <div class="about-inner">
+    <span class="section-label reveal">REPRESENTATIVE</span>
+    <div class="about-header reveal reveal-delay-1">
+      <div class="about-name-block">
+        <div class="about-name">⚫︎⚫︎　⚫︎⚫︎</div>
+        <div class="about-role">代表 / ラクWebサービス</div>
+      </div>
+      <!-- <div class="about-tech-tags" aria-label="対応技術">
+        <span class="tech-tag">HTML / CSS</span>
+        <span class="tech-tag">JavaScript</span>
+        <span class="tech-tag">PHP</span>
+        <span class="tech-tag">VBA (Excel / Access)</span>
+      </div> -->
     </div>
+    <div class="about-divider reveal reveal-delay-2"></div>
+    <div class="about-text reveal reveal-delay-3">
+      <p>中小企業が抱えるアナログな事務作業の課題に向き合い、無理のないIT化を丁寧にサポートします。</p>
+      <p>高額なシステム導入に頼らず、Googleスプレッドシート・Excelの自動化・Accessといった身近なツールを組み合わせることで、スタッフへの負担を最小限に抑えながら業務効率化を実現します。</p>
+      <p>ホームページ制作では単なる見た目の美しさだけでなく、GoogleやAIからの検索に見つけてもらいやすい構造を意識した設計を行います。</p>
+      <p>また、10〜20代のトレンドを常に研究しており、若い世代に届くコンテンツ制作・SNS運用代行にも対応しています。ぜひお気軽にご相談ください。</p>
+    </div>
+  </div>
 </section>
 
+<!-- お問い合わせ -->
+<section id="contact">
+  <div class="contact-inner">
+    <span class="section-label reveal">CONTACT</span>
+    <h2 class="section-heading reveal reveal-delay-1">まずは<br>お気軽にご相談を</h2>
+    <div class="contact-info reveal reveal-delay-2">
+      <div class="contact-info-item">
+        <div class="contact-info-label">ADDRESS</div>
+        <div class="contact-info-val">⚫︎⚫︎市⚫︎⚫︎区⚫︎12-34-56</div>
+      </div>
+      <div class="contact-info-item">
+        <div class="contact-info-label">PHONE</div>
+        <div class="contact-info-val">012-3456-7890</div>
+      </div>
+      <div class="contact-info-item">
+        <div class="contact-info-label">WEB</div>
+        <div class="contact-info-val">https://rakuwebsupport.github.io/service/</div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-3">
+      <a href="（GoogleフォームのURLをここに入力）" target="_blank" rel="noopener" class="btn-contact">
+        <span>お問い合わせフォームへ</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 13L13 1M13 1H4M13 1V10" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- フッター -->
 <footer>
-    <div class="container">
-        <p>&copy; 2026 ○○事務所</p>
-    </div>
+  <div class="footer-logo-wrap">
+    <img src="logo.png" alt="ラクWebサポート" class="company-logo" style="height:30px;width:auto;">
+    <div class="footer-logo-text">ラク<span>Web</span>サービス</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#campaign">キャンペーン</a></li>
+    <li><a href="#services">サービス</a></li>
+    <li><a href="#about">代表</a></li>
+    <li><a href="#contact">お問い合わせ</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 ラクWebサービス</div>
 </footer>
 
-<script src="script.js"></script>
+<script>
+/* ════════════════════════════════
+   ローダー
+════════════════════════════════ */
+(function(){
+  const bar = document.getElementById('loaderBar');
+  const loader = document.getElementById('loader');
+  let w = 0;
+  const iv = setInterval(() => {
+    w += Math.random() * 18 + 4;
+    if (w >= 100) {
+      w = 100;
+      clearInterval(iv);
+      setTimeout(() => {
+        loader.style.transition = 'opacity 0.6s';
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.display = 'none'; initHero(); }, 600);
+      }, 300);
+    }
+    bar.style.width = w + '%';
+  }, 80);
+})();
+
+/* ════════════════════════════════
+   カスタムカーソル
+════════════════════════════════ */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function animCursor(){
+  cursor.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+  requestAnimationFrame(animCursor);
+})();
+document.querySelectorAll('a,button,.service-card,.feature-item').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+});
+
+/* ════════════════════════════════
+   スクロールプログレス
+════════════════════════════════ */
+const prog = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  prog.style.transform = `scaleX(${pct})`;
+});
+
+/* ════════════════════════════════
+   ナビ スクロール
+════════════════════════════════ */
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+/* ════════════════════════════════
+   ヒーロー Canvas
+════════════════════════════════ */
+function initHero(){
+  ['heroEyebrow','heroTitle','heroSub','heroCta'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el){ el.style.opacity='1'; el.style.transform='none'; }
+  });
+
+  const canvas = document.getElementById('heroCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize(){
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const NODE_COUNT = 55;
+  const nodes = Array.from({length: NODE_COUNT}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r:  Math.random() * 2 + 1
+  }));
+
+  let mouseX = canvas.width / 2, mouseY = canvas.height / 2;
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+  });
+
+  function draw(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // グリッド
+    ctx.strokeStyle = 'rgba(37,85,160,0.07)';
+    ctx.lineWidth = 0.5;
+    const gStep = 48;
+    for(let x = 0; x < canvas.width; x += gStep){
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke();
+    }
+    for(let y = 0; y < canvas.height; y += gStep){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
+    }
+
+    nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if(n.x < 0 || n.x > canvas.width)  n.vx *= -1;
+      if(n.y < 0 || n.y > canvas.height) n.vy *= -1;
+      const dx = mouseX - n.x, dy = mouseY - n.y;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist < 120){ n.vx += dx/dist*0.012; n.vy += dy/dist*0.012; }
+      const spd = Math.sqrt(n.vx*n.vx+n.vy*n.vy);
+      if(spd > 0.9){ n.vx = n.vx/spd*0.9; n.vy = n.vy/spd*0.9; }
+    });
+
+    for(let i=0;i<nodes.length;i++){
+      for(let j=i+1;j<nodes.length;j++){
+        const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<110){
+          ctx.strokeStyle = `rgba(37,85,160,${(1-d/110)*0.25})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x,nodes[i].y);
+          ctx.lineTo(nodes[j].x,nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(37,85,160,0.5)';
+      ctx.fill();
+    });
+
+    const grad = ctx.createRadialGradient(mouseX,mouseY,0,mouseX,mouseY,80);
+    grad.addColorStop(0, 'rgba(74,125,212,0.12)');
+    grad.addColorStop(1, 'rgba(74,125,212,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(mouseX,mouseY,80,0,Math.PI*2);
+    ctx.fill();
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ════════════════════════════════
+   Intersection Observer
+════════════════════════════════ */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      const num = entry.target.querySelector('.count-num');
+      if(num && !num.dataset.counted){
+        num.dataset.counted = '1';
+        countUp(num);
+      }
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ════════════════════════════════
+   カウントアップ
+════════════════════════════════ */
+function countUp(el){
+  const target = parseInt(el.dataset.target, 10);
+  const dur = 1400;
+  const start = performance.now();
+  (function step(now){
+    const t = Math.min((now-start)/dur, 1);
+    const ease = 1 - Math.pow(1-t, 3);
+    el.textContent = Math.round(ease * target);
+    if(t < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  })(start);
+}
+
+/* ════════════════════════════════
+   カウントダウン（30日後）
+════════════════════════════════ */
+(function(){
+  const end = new Date();
+  end.setDate(end.getDate() + 30);
+  end.setHours(23,59,59,0);
+  function update(){
+    const diff = end - new Date();
+    if(diff <= 0){
+      ['cdDays','cdHours','cdMins','cdSecs'].forEach(id=>{
+        document.getElementById(id).textContent='00';
+      });
+      return;
+    }
+    const d = Math.floor(diff/86400000);
+    const h = Math.floor((diff%86400000)/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    document.getElementById('cdDays').textContent  = String(d).padStart(2,'0');
+    document.getElementById('cdHours').textContent = String(h).padStart(2,'0');
+    document.getElementById('cdMins').textContent  = String(m).padStart(2,'0');
+    document.getElementById('cdSecs').textContent  = String(s).padStart(2,'0');
+  }
+  update();
+  setInterval(update, 1000);
+})();
+
+/* ════════════════════════════════
+   ターミナルアニメ（日本語ベース）
+════════════════════════════════ */
+(function(){
+  const lines = [
+    { type:'comment', text:'// ●●Webサービス — ご提案内容' },
+    { type:'blank', text:'' },
+    { type:'key', text:'対象', extra:' : {' },
+    { type:'prop', key:'  お客様',     val:'"中小企業様"' },
+    { type:'prop', key:'  費用',       val:'"ご要件に合わせ柔軟対応"' },
+    { type:'prop', key:'  使用ツール', val:'["Gスプレッドシート","Excel自動化","Access","HP制作"]' },
+    { type:'prop', key:'  検索対応',   val:'{ Google: true, AI検索: true }' },
+    { type:'prop', key:'  業務削減',   val:'"平均 -30%"' },
+    { type:'close', text:'}' },
+    { type:'blank', text:'' },
+    { type:'comment', text:'// 無料相談受付中' },
+    { type:'run', text:'ご相談受付中 → お見積もり無料' },
+  ];
+
+  const body = document.getElementById('terminalBody');
+  let i = 0;
+
+  function addLine(){
+    if(i >= lines.length){ addCursor(); return; }
+    const l = lines[i++];
+    const span = document.createElement('span');
+    span.className = 't-line';
+    if(l.type === 'comment'){
+      span.innerHTML = `<span class="t-comment">${l.text}</span>`;
+    } else if(l.type === 'blank'){
+      span.innerHTML = '&nbsp;';
+    } else if(l.type === 'key'){
+      span.innerHTML = `<span class="t-key">${l.text}</span><span class="t-val">${l.extra||''}</span>`;
+    } else if(l.type === 'prop'){
+      span.innerHTML = `<span class="t-key">${l.key}</span>: <span class="t-string">${l.val}</span>,`;
+    } else if(l.type === 'close'){
+      span.innerHTML = `<span class="t-val">${l.text}</span>`;
+    } else if(l.type === 'run'){
+      span.innerHTML = `<span class="t-prompt">▶ </span><span class="t-string">${l.text}</span>`;
+    } else {
+      span.textContent = l.text;
+    }
+    body.appendChild(span);
+    setTimeout(addLine, 130);
+  }
+
+  function addCursor(){
+    const c = document.createElement('span');
+    c.className = 't-cursor';
+    body.appendChild(c);
+  }
+
+  const termEl = document.querySelector('.feature-terminal');
+  const termIO = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting){ addLine(); termIO.disconnect(); }
+  }, { threshold: 0.3 });
+  termIO.observe(termEl);
+})();
+
+/* ════════════════════════════════
+   スムーズスクロール
+════════════════════════════════ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target){
+      e.preventDefault();
+      target.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  });
+});
+</script>
 </body>
 </html>
